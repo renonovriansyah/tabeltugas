@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Manajemen Tugas</title>
+  <style>
+    /* Reset & Body */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f8f9fa;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fa;
+}
+
+.main-content .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.main-content .header h1 {
+  font-size: 20px;
+  color: #333;
+}
+
+.main-content .header button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.main-content .header button:hover {
+  background: #0056b3;
+}
+
+/* Table */
+.table-container {
+  flex: 1;
+  padding: 20px;
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.table-container th,
+.table-container td {
+  padding: 12px 15px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.table-container th {
+  background: #007bff;
+  color: #fff;
+}
+
+.table-container tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+.table-container td button {
+  font-size: 12px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.table-container td button.edit {
+  background: #ffc107;
+  color: #fff;
+}
+.table-container td button.edit:hover {
+  background-color: #d3a006;
+  transform: scale(1.05);
+}
+
+.table-container td button.delete {
+  background: #f44336;
+  color: #fff;
+}
+.table-container td button.delete:hover {
+  background-color: #c0392b; /* Merah lebih gelap */
+  transform: scale(1.05);
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  width: 400px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.modal-content h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content label {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.modal-content input,
+.modal-content select {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.modal-content button {
+  padding: 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal-content button[type="submit"] {
+  background: #4caf50;
+  color: white;
+}
+
+.modal-content .close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+
+  .main-content {
+    margin: 0;
+  }
+
+  .modal-content {
+    width: 90%;
+  }
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Konten Utama -->
+    <div class="main-content">
+      <!-- Header -->
+      <div class="header">
+        <div id="clock"></div>
+        <h1 style="flex:1; text-align:center;">TableWorkExchange</h1>
+        <button id="addTaskBtn">+ Tambah Tugas</button>
+      </div>
+
+      <!-- Tabel -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama Tugas</th>
+              <th>Tenggat Waktu</th>
+              <th>Sisa Waktu</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="taskTableBody">
+            <!-- Baris akan dibuat secara dinamis -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="taskModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Tambah Tugas</h2>
+      <form id="taskForm">
+        <label for="taskName">Nama Tugas</label>
+        <input type="text" id="taskName" name="taskName" required>
+
+        <label for="deadline">Tenggat Waktu</label>
+        <input type="date" id="deadline" name="deadline" required>
+
+        <button type="submit">Simpan</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Fungsi untuk membuka dan menutup modal
+const taskModal = document.getElementById("taskModal");
+const addTaskBtn = document.getElementById("addTaskBtn");
+
+addTaskBtn.addEventListener("click", () => {
+  taskModal.style.display = "flex";
+});
+
+function closeModal() {
+  taskModal.style.display = "none";
+}
+
+// Menyimpan tugas di localStorage
+const taskTableBody = document.getElementById("taskTableBody");
+const taskForm = document.getElementById("taskForm");
+
+taskForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const taskName = document.getElementById("taskName").value;
+  const deadline = document.getElementById("deadline").value;
+
+  const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+  if (editingIndex !== null) {
+    // Update data tugas yang sedang diedit
+    tasks[editingIndex] = { taskName, deadline };
+    editingIndex = null; // Reset indeks setelah penyimpanan
+  } else {
+    // Tambahkan tugas baru
+    tasks.push({ taskName, deadline });
+  }
+
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  displayTasks();
+  closeModal();
+  taskForm.reset();
+});
+
+// Menampilkan tugas dari localStorage
+function displayTasks() {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    
+    // ⬇️ Sorting berdasarkan deadline terdekat
+    tasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+
+    taskTableBody.innerHTML = "";
+    tasks.forEach((task, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${task.taskName}</td>
+            <td>${formatDate(task.deadline)}</td>
+            <td class="remaining-time">${calculateRemainingTime(task.deadline)}</td>
+            <td>
+                <button class="edit" onclick="editTask(${index})">Edit</button>
+                <button class="delete" onclick="deleteTask(${index})">Hapus</button>
+            </td>
+        `;
+        taskTableBody.appendChild(row);
+    });
+}
+
+
+// Menghitung sisa waktu
+function calculateRemainingTime(deadline) {
+    const deadlineDate = new Date(deadline);
+    const now = new Date();
+    const diff = deadlineDate - now;
+
+    if (diff <= 0) return "Lewat Waktu";
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
+    return `${days} hari ${hours} jam ${minutes} menit`;
+}
+
+// Fungsi untuk mengedit tugas
+let editingIndex = null; // Variabel untuk menyimpan indeks tugas yang sedang diedit
+
+function editTask(index) {
+  const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  const task = tasks[index];
+
+  document.getElementById("taskName").value = task.taskName;
+  document.getElementById("deadline").value = task.deadline;
+
+  editingIndex = index; // Simpan indeks tugas yang sedang diedit
+  taskModal.style.display = "flex";
+}
+
+// Fungsi untuk menghapus tugas
+function deleteTask(index) {
+    const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    const taskName = tasks[index].taskName; // Ambil nama tugas
+
+    const confirmDelete = confirm(`Apakah Anda yakin ingin menghapus tugas "${taskName}"?`);
+    if (confirmDelete) {
+        tasks.splice(index, 1);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        displayTasks();
+    }
+}
+
+function updateClock() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    document.getElementById("clock").innerText = `${hours}:${minutes}:${seconds}`;
+}
+setInterval(updateClock, 1000); // ⬅️ Update setiap detik
+updateClock(); // ⬅️ Jalankan saat halaman dimuat
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Karena bulan dimulai dari 0
+    const year = date.getFullYear();
+    return `${day} - ${month} - ${year}`;
+}
+
+document.getElementById("taskName").addEventListener("input", function () {
+    this.value = this.value.replace(/\b\w/g, char => char.toUpperCase());
+});
+
+// Menampilkan tugas saat halaman dimuat
+document.addEventListener("DOMContentLoaded", displayTasks);
+  </script>
+</body>
+</html>
