@@ -77,6 +77,16 @@ body {
   font-size: 14px;
 }
 
+.table-container td div {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 3px;
+}
+
+.table-container td div:first-child {
+    font-weight: bold;
+}
+
 .table-container th {
   background: #007bff;
   color: #fff;
@@ -185,6 +195,8 @@ body {
   font-size: 20px;
   cursor: pointer;
 }
+
+
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -299,10 +311,20 @@ function displayTasks() {
 
     taskTableBody.innerHTML = "";
     tasks.forEach((task, index) => {
+        const deadlineDate = new Date(task.deadline);
+        const daysOfWeek = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        const dayName = daysOfWeek[deadlineDate.getDay()]; // Ambil nama hari
+        const day = String(deadlineDate.getDate()).padStart(2, '0');
+        const month = String(deadlineDate.getMonth() + 1).padStart(2, '0');
+        const year = deadlineDate.getFullYear();
+
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${task.taskName}</td>
-            <td>${formatDate(task.deadline)}</td>
+            <td>
+                <div style="font-weight:bold">${dayName}</div>
+                <div>${day} - ${month} - ${year}</div>
+            </td>
             <td class="remaining-time">${calculateRemainingTime(task.deadline)}</td>
             <td>
                 <button class="edit" onclick="editTask(${index})">Edit</button>
@@ -314,20 +336,19 @@ function displayTasks() {
     });
 }
 
-
 // Menghitung sisa waktu
 function calculateRemainingTime(deadline) {
     const deadlineDate = new Date(deadline);
     const now = new Date();
     const diff = deadlineDate - now;
 
-    if (diff <= 0) return "Lewat Waktu";
+    if (diff <= 0) return "Melewati Waktu";
 
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((diff / (1000 * 60)) % 60);
 
-    return `${days} hari ${hours} jam ${minutes} menit`;
+    return `${days} Hari ${hours} Jam ${minutes} Menit`;
 }
 
 // Fungsi untuk mengedit tugas
@@ -362,10 +383,18 @@ function updateClock() {
     const hours = String(now.getHours()).padStart(2, "0");
     const minutes = String(now.getMinutes()).padStart(2, "0");
     const seconds = String(now.getSeconds()).padStart(2, "0");
-    document.getElementById("clock").innerText = `${hours}:${minutes}:${seconds}`;
+
+    const daysOfWeek = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    const dayName = daysOfWeek[now.getDay()];
+
+    document.getElementById("clock").innerHTML = `
+        <div style="font-weight:bold">${dayName}</div>
+        <div>${hours}:${minutes}:${seconds}</div>
+    `;
 }
-setInterval(updateClock, 1000); // ⬅️ Update setiap detik
-updateClock(); // ⬅️ Jalankan saat halaman dimuat
+
+setInterval(updateClock, 1000); // Update setiap detik
+updateClock(); // Jalankan saat halaman dimuat
 
 function formatDate(dateString) {
     const date = new Date(dateString);
