@@ -209,8 +209,8 @@ body {
       <!-- Header -->
       <div class="header">
         <div id="clock"></div>
-        <h1 style="flex:1; text-align:center;">TableWorkExchange</h1>
-        <button id="addTaskBtn">+ Tambah Tugas</button>
+        <h1 style="flex:1; text-align:center;">TableWork</h1>
+        <button id="addTaskBtn">+ Add</button>
       </div>
 
       <!-- Tabel -->
@@ -305,6 +305,8 @@ function displayTasks() {
             <td class="remaining-time">${calculateRemainingTime(task.deadline)}</td>
             <td>
                 <button class="edit" onclick="editTask(${index})">Edit</button>
+                <br>
+                <br>
                 <button class="delete" onclick="deleteTask(${index})">Hapus</button>
             </td>
         `;
