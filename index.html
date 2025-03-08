@@ -280,56 +280,55 @@ const taskTableBody = document.getElementById("taskTableBody");
 const taskForm = document.getElementById("taskForm");
 
 taskForm.addEventListener("submit", (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const taskName = document.getElementById("taskName").value;
-  const deadline = document.getElementById("deadline").value;
+    const taskName = document.getElementById("taskName").value;
+    const deadline = document.getElementById("deadline").value;
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-  const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    if (editingIndex !== null) {
+        // Edit berdasarkan ID
+        tasks = tasks.map(task => task.id === editingIndex ? { id: task.id, taskName, deadline } : task);
+        editingIndex = null;
+    } else {
+        // Buat ID unik
+        const newTask = { id: Date.now(), taskName, deadline };
+        tasks.push(newTask);
+    }
 
-  if (editingIndex !== null) {
-    // Update data tugas yang sedang diedit
-    tasks[editingIndex] = { taskName, deadline };
-    editingIndex = null; // Reset indeks setelah penyimpanan
-  } else {
-    // Tambahkan tugas baru
-    tasks.push({ taskName, deadline });
-  }
-
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  displayTasks();
-  closeModal();
-  taskForm.reset();
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    displayTasks();
+    closeModal();
+    taskForm.reset();
 });
 
 // Menampilkan tugas dari localStorage
 function displayTasks() {
     let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-    
-    // ⬇️ Sorting berdasarkan deadline terdekat
+
+    // Urutkan berdasarkan deadline
     tasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
 
     taskTableBody.innerHTML = "";
-    tasks.forEach((task, index) => {
-        const deadlineDate = new Date(task.deadline);
-        const daysOfWeek = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-        const dayName = daysOfWeek[deadlineDate.getDay()]; // Ambil nama hari
-        const day = String(deadlineDate.getDate()).padStart(2, '0');
-        const month = String(deadlineDate.getMonth() + 1).padStart(2, '0');
-        const year = deadlineDate.getFullYear();
+    tasks.forEach(task => {
+        let deadlineDate = new Date(task.deadline);
+        let dayName = deadlineDate.toLocaleDateString("id-ID", { weekday: "long" });
+        let day = deadlineDate.getDate();
+        let month = deadlineDate.toLocaleDateString("id-ID", { month: "long" });
+        let year = deadlineDate.getFullYear();
 
-        const row = document.createElement("tr");
+        let row = document.createElement("tr");
         row.innerHTML = `
             <td>${task.taskName}</td>
             <td>
                 <div style="font-weight:bold">${dayName}</div>
-                <div>${day} - ${month}   ${year}</div>
+                <div>${day} - ${month} ${year}</div>
             </td>
             <td class="remaining-time">${calculateRemainingTime(task.deadline)}</td>
             <td>
-                <button class="edit" onclick="editTask(${index})">Edit</button>
+                <button class="edit" onclick="editTask(${task.id})">Edit</button>
                 <br>
-                <button class="delete" onclick="deleteTask(${index})">Hapus</button>
+                <button class="delete" onclick="deleteTask(${task.id})">Hapus</button>
             </td>
         `;
         taskTableBody.appendChild(row);
@@ -354,27 +353,34 @@ function calculateRemainingTime(deadline) {
 // Fungsi untuk mengedit tugas
 let editingIndex = null; // Variabel untuk menyimpan indeks tugas yang sedang diedit
 
-function editTask(index) {
-  const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-  const task = tasks[index];
+function editTask(taskId) {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    let taskToEdit = tasks.find(task => task.id === taskId);
 
-  document.getElementById("taskName").value = task.taskName;
-  document.getElementById("deadline").value = task.deadline;
-
-  editingIndex = index; // Simpan indeks tugas yang sedang diedit
-  taskModal.style.display = "flex";
+    if (taskToEdit) {
+        document.getElementById("taskName").value = taskToEdit.taskName;
+        document.getElementById("deadline").value = taskToEdit.deadline;
+        editingIndex = taskId;
+        taskModal.style.display = "flex";
+    } else {
+        console.error("Tugas tidak ditemukan!");
+    }
 }
 
 // Fungsi untuk menghapus tugas
-function deleteTask(index) {
-    const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-    const taskName = tasks[index].taskName; // Ambil nama tugas
+function deleteTask(taskId) {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    let taskToDelete = tasks.find(task => task.id === taskId);
 
-    const confirmDelete = confirm(`Apakah Anda yakin ingin menghapus tugas "${taskName}"?`);
-    if (confirmDelete) {
-        tasks.splice(index, 1);
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-        displayTasks();
+    if (taskToDelete) {
+        const confirmDelete = confirm(`Apakah Anda yakin ingin menghapus tugas "${taskToDelete.taskName}"?`);
+        if (confirmDelete) {
+            tasks = tasks.filter(task => task.id !== taskId);
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+            displayTasks();
+        }
+    } else {
+        console.error("Tugas tidak ditemukan!");
     }
 }
 
