@@ -322,7 +322,7 @@ function displayTasks() {
             <td>${task.taskName}</td>
             <td>
                 <div style="font-weight:bold">${dayName}</div>
-                <div>${day} - ${month} ${year}</div>
+                <div>${day} ${month} ${year}</div>
             </td>
             <td class="remaining-time">${calculateRemainingTime(task.deadline)}</td>
             <td>
@@ -407,7 +407,7 @@ function formatDate(dateString) {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Karena bulan dimulai dari 0
     const year = date.getFullYear();
-    return `${day} - ${month}   ${year}`;
+    return `${day}   ${month}   ${year}`;
 }
 
 document.getElementById("taskName").addEventListener("input", function () {
