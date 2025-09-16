@@ -1,421 +1,597 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Manajemen Tugas</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TableWork — Dashboard Tugas</title>
   <style>
-    /* Reset & Body */
-body {
-  font-family: 'Arial', sans-serif;
-  margin: 0;
-  padding: 0;
-  background: #f8f9fa;
-}
+    :root{
+      --bg: #eef2f6;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #0b78ff;
+      --success: #16a34a;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --glass: rgba(255,255,255,0.6);
+      --shadow: 0 6px 18px rgba(16,24,40,0.08);
+      --radius: 12px;
+      --accent: linear-gradient(135deg,var(--primary),#0056b3);
+    }
 
-.container {
-  display: flex;
-  height: 100vh;
-}
+    /* Dark theme variables */
+    .dark {
+      --bg: #0b1220;
+      --card: #081226;
+      --text: #e6eef8;
+      --muted: #94a3b8;
+      --glass: rgba(255,255,255,0.03);
+      --shadow: 0 8px 24px rgba(2,6,23,0.6);
+    }
 
-/* Main Content */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: #f8f9fa;
-}
+    /* Reset */
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+    body{
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(11,120,255,0.06), transparent),
+                  radial-gradient(800px 400px at 90% 90%, rgba(5,150,100,0.04), transparent),
+                  var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:20px;
+    }
 
-.main-content .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  background: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
-}
+    /* Layout */
+    .wrap {
+      max-width:1100px;
+      margin: 20px auto;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
 
-.main-content .header h1 {
-  font-size: 20px;
-  color: #333;
-}
+    header.appbar {
+      display:flex;
+      align-items:center;
+      gap:16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.35));
+      backdrop-filter: blur(6px);
+      padding:12px 16px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .dark header.appbar{ background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); }
 
-.main-content .header button {
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 15px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:220px;
+    }
+    .logo {
+      width:44px;height:44px;border-radius:10px;
+      background:var(--accent);
+      display:grid;place-items:center;color:#fff;font-weight:700;box-shadow:0 6px 18px rgba(11,120,255,0.15);
+    }
+    .brand h1{font-size:16px;margin:0}
+    .brand p{font-size:12px;margin:0;color:var(--muted)}
 
-.main-content .header button:hover {
-  background: #0056b3;
-}
+    /* controls */
+    .controls {
+      margin-left:auto;
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .clock {
+      text-align:center;
+      min-width:120px;
+      border-radius:10px;
+      padding:8px 10px;
+      background:var(--glass);
+      box-shadow: 0 3px 8px rgba(2,6,23,0.04);
+    }
+    .clock .day{font-weight:600;font-size:12px}
+    .clock .time{font-size:18px;font-weight:700;letter-spacing:0.5px}
 
-/* Table */
-.table-container {
-  flex: 1;
-  padding: 20px;
-}
+    select, button, input[type="search"]{
+      padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.06); background:transparent; color:var(--text);
+      transition:transform .18s ease, box-shadow .18s ease;
+    }
+    .dark select, .dark button, .dark input[type="search"]{ border:1px solid rgba(255,255,255,0.04) }
 
-.table-container table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #fff;
-  border-radius: 5px;
-  overflow: hidden;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+    select:focus, button:focus, input:focus{ outline:none; box-shadow:0 6px 18px rgba(11,120,255,0.08); transform:translateY(-2px) }
 
-.table-container th,
-.table-container td {
-  padding: 12px 15px;
-  text-align: center;
-  font-size: 14px;
-}
+    button.primary{
+      background:var(--primary); color:white; border:none; cursor:pointer; font-weight:600;
+      display:inline-flex; gap:8px; align-items:center;
+      box-shadow: 0 8px 24px rgba(11,120,255,0.12);
+    }
 
-.table-container td div {
-    display: block;
-    font-size: 14px;
-    margin-bottom: 3px;
-}
+    /* content card */
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(0,0,0,0.04);
+    }
+    .dark .card { border:1px solid rgba(255,255,255,0.03) }
 
-.table-container td div:first-child {
-    font-weight: bold;
-}
+    /* top tools */
+    .tools {
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
 
-.table-container th {
-  background: #007bff;
-  color: #fff;
-}
+    .searchbox {
+      display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:var(--glass);
+      min-width:260px;
+    }
+    .searchbox input{border:none;background:transparent;outline:none;width:100%}
 
-.table-container tr:nth-child(even) {
-  background: #f9f9f9;
-}
+    /* table */
+    table {
+      width:100%;
+      border-collapse:collapse;
+      border-radius:10px;
+      overflow:hidden;
+      font-size:14px;
+      min-width:720px;
+    }
+    thead th {
+      text-align:center;padding:14px;background:var(--accent); color:#fff; font-weight:700;
+      position:sticky; top:0; z-index:2;
+    }
+    tbody tr {
+      transition: transform .18s ease, background .18s ease;
+      cursor:default;
+    }
+    tbody tr:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(2,6,23,0.06); background: rgba(11,120,255,0.03); }
+    td, th { padding:12px 10px; text-align:center; vertical-align:middle; }
 
-.table-container td button {
-  font-size: 12px;
-  padding: 5px 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-  margin-bottom: 5px;
-}
+    /* badge */
+    .badge {
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:600;
+      font-size:13px;
+      color:#fff;
+    }
+    .badge.ok{ background:var(--success) }
+    .badge.warn{ background:var(--warning); color:#1a1a1a }
+    .badge.urgent{ background:#ff7a5c }
+    .badge.dead{ background:var(--danger) }
 
-.table-container td button.edit {
-  background: #ffc107;
-  color: #fff;
-}
-.table-container td button.edit:hover {
-  background-color: #d3a006;
-  transform: scale(1.05);
-}
+    /* Tampilkan nama hari di atas tanggal (kolom) */
+    .dl-wrapper{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+    }
+    .dl-wrapper .dl-day{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:600;
+      line-height:1;
+    }
+    .dl-wrapper .dl-date{
+      font-weight:700;
+      font-size:14px;
+      line-height:1;
+    }
+    /* action buttons */
+    .action-btn{
+      padding:8px 10px;border-radius:8px;border:none; cursor:pointer; font-weight:600; margin:4px;
+      transition:transform .12s ease;
+    }
+    .action-btn:hover{ transform:translateY(-3px) }
+    .btn-edit{ background:#f59e0b; color:#fff }
+    .btn-delete{ background: #ef4444; color:#fff }
+    .btn-view{ background:#06b6d4; color:#fff }
 
-.table-container td button.delete {
-  background: #f44336;
-  color: #fff;
-}
-.table-container td button.delete:hover {
-  background-color: #c0392b; /* Merah lebih gelap */
-  transform: scale(1.05);
-}
+    /* modal */
+    .modal {
+      position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.5);
+      z-index:9999;
+    }
+    .modal.show{ display:flex; }
+    .modal-card {
+      width:420px; max-width:94%; border-radius:14px; padding:18px; background:var(--card); box-shadow:0 20px 60px rgba(2,6,23,0.4);
+      transform:translateY(-10px); animation:pop .28s ease;
+    }
+    @keyframes pop{ from{opacity:0; transform:translateY(-20px) scale(.98)} to{opacity:1; transform:translateY(0) scale(1)}}
+    .modal-card h3{margin:0 0 10px}
+    .form-row{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+    .modal-card .row{display:flex;gap:8px}
+    .close-x{position:absolute;right:18px;top:18px;cursor:pointer;font-size:18px;color:var(--muted)}
 
-/* Modal */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
+    /* toast */
+    .toast {
+      position:fixed; right:20px; bottom:20px; min-width:220px;
+      background:rgba(0,0,0,0.75); color:#fff; padding:12px 16px; border-radius:12px; box-shadow:0 10px 30px rgba(2,6,23,0.4);
+      transform:translateY(20px); opacity:0; transition:all .36s ease; z-index:99999;
+    }
+    .toast.show{ transform:translateY(0); opacity:1; }
 
-.modal-content {
-  background: #fff;
-  padding: 20px;
-  width: 400px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  position: relative;
-}
+    /* footer small */
+    .meta { font-size:13px;color:var(--muted); margin-top:8px; text-align:right }
 
-.modal-content h2 {
-  margin: 0;
-  font-size: 18px;
-  color: #333;
-  text-align: center;
-  margin-bottom: 20px;
-}
+    /* responsive */
+    @media (max-width:900px){
+      .brand p{display:none}
+      .clock{min-width:100px}
+      table{font-size:13px}
+      thead th{font-size:13px}
+    }
 
-.modal-content form {
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-content label {
-  font-size: 14px;
-  color: #555;
-  margin-bottom: 5px;
-}
-
-.modal-content input,
-.modal-content select {
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 15px;
-}
-
-.modal-content button {
-  padding: 10px;
-  font-size: 14px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.modal-content button[type="submit"] {
-  background: #4caf50;
-  color: white;
-}
-
-.modal-content .close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-
-
-/* Responsive */
-@media (max-width: 768px) {
-  .sidebar {
-    display: none;
-  }
-
-  .main-content {
-    margin: 0;
-  }
-
-  .modal-content {
-    width: 90%;
-  }
-}
   </style>
 </head>
 <body>
-  <div class="container">
-
-    <!-- Konten Utama -->
-    <div class="main-content">
-      <!-- Header -->
-      <div class="header">
-        <div id="clock"></div>
-        <h1 style="flex:1; text-align:center;">TableWork</h1>
-        <button id="addTaskBtn">+ Add</button>
+  <div class="wrap">
+    <header class="appbar card" role="banner">
+      <div class="brand" aria-hidden="false">
+        <div class="logo">TW</div>
+        <div>
+          <h1>TableWork</h1>
+          <p>Dashboard Manajemen Tugas</p>
+        </div>
       </div>
 
-      <!-- Tabel -->
-      <div class="table-container">
-        <table>
+      <div class="controls" role="region" aria-label="Kontrol utama">
+        <div class="clock" id="clock" aria-live="polite">
+          <div class="day">--</div>
+          <div class="time">--:--:--</div>
+        </div>
+
+        <div class="tools">
+          <div class="searchbox" title="Cari tugas">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.5"/></svg>
+            <input id="qSearch" type="search" placeholder="Cari nama tugas..." aria-label="Cari tugas">
+          </div>
+
+          <select id="sortBy" aria-label="Urutkan tugas">
+            <option value="deadline_asc">Deadline Terdekat</option>
+            <option value="deadline_desc">Deadline Terjauh</option>
+            <option value="created_desc">Terbaru</option>
+          </select>
+
+          <button class="primary" id="addTaskBtn" aria-haspopup="dialog" title="Tambah tugas">➕ Tambah</button>
+
+          <button id="darkToggle" title="Toggle Dark Mode" aria-pressed="false" style="padding:8px 10px;border-radius:10px">
+            🌙
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="card" role="main" aria-live="polite">
+      <div class="tools" style="justify-content:space-between;align-items:center;">
+        <div style="font-weight:700">Daftar Tugas</div>
+        <div class="meta">Fitur: filter • dark mode • badge status • toast</div>
+      </div>
+
+      <div style="overflow:auto; border-radius:10px;">
+        <table aria-describedby="task-list">
           <thead>
             <tr>
-              <th>Nama Tugas</th>
-              <th>Tenggat Waktu</th>
-              <th>Sisa Waktu</th>
-              <th>Aksi</th>
+              <th style="min-width:220px">Nama Tugas</th>
+              <th style="min-width:180px">Tenggat</th>
+              <th style="min-width:140px">Sisa Waktu</th>
+              <th style="min-width:160px">Status</th>
+              <th style="min-width:170px">Aksi</th>
             </tr>
           </thead>
           <tbody id="taskTableBody">
-            <!-- Baris akan dibuat secara dinamis -->
+            <!-- dinamis -->
           </tbody>
         </table>
       </div>
-    </div>
+    </main>
+
+    <footer style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <div style="color:var(--muted)">TableWork • Rapikan Catatanmu & Kerjakan Tugasmu</div>
+      <div style="color:var(--muted);font-size:13px">Data disimpan hanya di browser ini</div>
+    </footer>
   </div>
 
   <!-- Modal -->
-  <div id="taskModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h2>Tambah Tugas</h2>
-      <form id="taskForm">
-        <label for="taskName">Nama Tugas</label>
-        <input type="text" id="taskName" name="taskName" required>
+  <div id="taskModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card card" role="document">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 id="modalTitle">Tambah Tugas</h3>
+        <div style="position:relative">
+          <button id="closeModal" class="action-btn" title="Tutup">✖</button>
+        </div>
+      </div>
 
-        <label for="deadline">Tenggat Waktu</label>
-        <input type="date" id="deadline" name="deadline" required>
+      <form id="taskForm" autocomplete="off" novalidate>
+        <div class="form-row">
+          <label for="taskName">Nama Tugas</label>
+          <input id="taskName" type="text" required placeholder="Contoh: Buat Laporan" aria-required="true" />
+        </div>
 
-        <button type="submit">Simpan</button>
+        <div class="form-row">
+          <label for="deadline">Tenggat Waktu</label>
+          <input id="deadline" type="date" required aria-required="true" />
+        </div>
+
+        <div class="row" style="justify-content:flex-end">
+          <button type="button" id="cancelBtn" class="action-btn" style="background:transparent;border:1px solid rgba(0,0,0,0.06);">Batal</button>
+          <button type="submit" class="action-btn primary">💾 Simpan</button>
+        </div>
       </form>
     </div>
   </div>
 
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
   <script>
-    // Fungsi untuk membuka dan menutup modal
-const taskModal = document.getElementById("taskModal");
-const addTaskBtn = document.getElementById("addTaskBtn");
+    /* === STATE === */
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const taskModal = document.getElementById('taskModal');
+    const closeModal = document.getElementById('closeModal');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const taskForm = document.getElementById('taskForm');
+    const taskTableBody = document.getElementById('taskTableBody');
+    const qSearch = document.getElementById('qSearch');
+    const sortBy = document.getElementById('sortBy');
+    const toastEl = document.getElementById('toast');
+    const darkToggle = document.getElementById('darkToggle');
+    const modalTitle = document.getElementById('modalTitle');
 
-addTaskBtn.addEventListener("click", () => {
-  taskModal.style.display = "flex";
-});
+    let editingId = null;
+    let refreshTimer = null;
 
-function closeModal() {
-  taskModal.style.display = "none";
-}
-
-// Menyimpan tugas di localStorage
-const taskTableBody = document.getElementById("taskTableBody");
-const taskForm = document.getElementById("taskForm");
-
-taskForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const taskName = document.getElementById("taskName").value;
-    const deadline = document.getElementById("deadline").value;
-    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-
-    if (editingIndex !== null) {
-        // Edit berdasarkan ID
-        tasks = tasks.map(task => task.id === editingIndex ? { id: task.id, taskName, deadline } : task);
-        editingIndex = null;
-    } else {
-        // Buat ID unik
-        const newTask = { id: Date.now(), taskName, deadline };
-        tasks.push(newTask);
+    /* === Utilities === */
+    function showToast(message, ms = 2600) {
+      toastEl.textContent = message;
+      toastEl.classList.add('show');
+      clearTimeout(toastEl._t);
+      toastEl._t = setTimeout(()=> toastEl.classList.remove('show'), ms);
     }
 
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    displayTasks();
-    closeModal();
-    taskForm.reset();
-});
+    function saveTasks(tasks) {
+      localStorage.setItem('tw_tasks', JSON.stringify(tasks));
+    }
+    function loadTasks(){
+      return JSON.parse(localStorage.getItem('tw_tasks') || '[]');
+    }
 
-// Menampilkan tugas dari localStorage
-function displayTasks() {
-    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    function uid(){ return Date.now() + Math.floor(Math.random()*1000); }
 
-    // Urutkan berdasarkan deadline
-    tasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    /* === Clock === */
+    function updateClock(){
+      const now = new Date();
+      const days = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+      document.querySelector('.clock .day').textContent = days[now.getDay()];
+      document.querySelector('.clock .time').textContent = now.toLocaleTimeString('id-ID');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
-    taskTableBody.innerHTML = "";
-    tasks.forEach(task => {
-        let deadlineDate = new Date(task.deadline);
-        let dayName = deadlineDate.toLocaleDateString("id-ID", { weekday: "long" });
-        let day = deadlineDate.getDate();
-        let month = deadlineDate.toLocaleDateString("id-ID", { month: "long" });
-        let year = deadlineDate.getFullYear();
-
-        let row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${task.taskName}</td>
-            <td>
-                <div style="font-weight:bold">${dayName}</div>
-                <div>${day} ${month} ${year}</div>
-            </td>
-            <td class="remaining-time">${calculateRemainingTime(task.deadline)}</td>
-            <td>
-                <button class="edit" onclick="editTask(${task.id})">Edit</button>
-                <br>
-                <button class="delete" onclick="deleteTask(${task.id})">Hapus</button>
-            </td>
-        `;
-        taskTableBody.appendChild(row);
+    /* === Dark mode persistence === */
+    function applyTheme(theme){
+      if(theme === 'dark') document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+      darkToggle.setAttribute('aria-pressed', theme === 'dark');
+      localStorage.setItem('tw_theme', theme);
+      darkToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+    darkToggle.addEventListener('click', ()=>{
+      const cur = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+      applyTheme(cur === 'dark' ? 'light' : 'dark');
     });
-}
+    (function initTheme(){
+      const saved = localStorage.getItem('tw_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      applyTheme(saved);
+    })();
 
-// Menghitung sisa waktu
-function calculateRemainingTime(deadline) {
-    const deadlineDate = new Date(deadline);
-    const now = new Date();
-    const diff = deadlineDate - now;
-
-    if (diff <= 0) return "Melewati Waktu";
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / (1000 * 60)) % 60);
-
-    return `${days} Hari ${hours} Jam ${minutes} Menit`;
-}
-
-// Fungsi untuk mengedit tugas
-let editingIndex = null; // Variabel untuk menyimpan indeks tugas yang sedang diedit
-
-function editTask(taskId) {
-    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-    let taskToEdit = tasks.find(task => task.id === taskId);
-
-    if (taskToEdit) {
-        document.getElementById("taskName").value = taskToEdit.taskName;
-        document.getElementById("deadline").value = taskToEdit.deadline;
-        editingIndex = taskId;
-        taskModal.style.display = "flex";
-    } else {
-        console.error("Tugas tidak ditemukan!");
+    /* === Modal controls === */
+    function openModal() {
+      modalTitle.textContent = editingId ? 'Edit Tugas' : 'Tambah Tugas';
+      taskModal.classList.add('show');
+      taskModal.setAttribute('aria-hidden','false');
+      document.getElementById('taskName').focus();
     }
-}
-
-// Fungsi untuk menghapus tugas
-function deleteTask(taskId) {
-    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-    let taskToDelete = tasks.find(task => task.id === taskId);
-
-    if (taskToDelete) {
-        const confirmDelete = confirm(`Apakah Anda yakin ingin menghapus tugas "${taskToDelete.taskName}"?`);
-        if (confirmDelete) {
-            tasks = tasks.filter(task => task.id !== taskId);
-            localStorage.setItem("tasks", JSON.stringify(tasks));
-            displayTasks();
-        }
-    } else {
-        console.error("Tugas tidak ditemukan!");
+    function closeModalFn() {
+      taskModal.classList.remove('show');
+      taskModal.setAttribute('aria-hidden','true');
+      editingId = null;
+      taskForm.reset();
     }
-}
+    addTaskBtn.addEventListener('click', ()=> { openModal(); });
+    closeModal.addEventListener('click', closeModalFn);
+    cancelBtn.addEventListener('click', closeModalFn);
+    taskModal.addEventListener('click', (e)=> { if(e.target === taskModal) closeModalFn(); });
 
-function updateClock() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const seconds = String(now.getSeconds()).padStart(2, "0");
+    /* === CRUD === */
+    taskForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const name = document.getElementById('taskName').value.trim();
+      const deadline = document.getElementById('deadline').value;
+      if(!name || !deadline){ showToast('Nama tugas & tenggat wajib diisi'); return; }
 
-    const daysOfWeek = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-    const dayName = daysOfWeek[now.getDay()];
+      let tasks = loadTasks();
+      if(editingId){
+        tasks = tasks.map(t => t.id === editingId ? {...t, taskName:name, deadline } : t);
+        showToast('Tugas berhasil diperbarui');
+      } else {
+        tasks.push({ id: uid(), taskName: name, deadline, createdAt: new Date().toISOString() });
+        showToast('Tugas berhasil ditambahkan');
+      }
+      saveTasks(tasks);
+      closeModalFn();
+      renderTasks();
+    });
 
-    document.getElementById("clock").innerHTML = `
-        <div style="font-weight:bold">${dayName}</div>
-        <div>${hours}:${minutes}:${seconds}</div>
-    `;
-}
+    window.editTask = function(id){
+      const tasks = loadTasks();
+      const t = tasks.find(x => x.id === id);
+      if(!t) { showToast('Tugas tidak ditemukan'); return; }
+      editingId = id;
+      document.getElementById('taskName').value = t.taskName;
+      document.getElementById('deadline').value = t.deadline;
+      openModal();
+    };
 
-setInterval(updateClock, 1000); // Update setiap detik
-updateClock(); // Jalankan saat halaman dimuat
+    window.deleteTask = function(id){
+      const tasks = loadTasks();
+      const t = tasks.find(x => x.id === id);
+      if(!t) return showToast('Tugas tidak ditemukan');
+      const doDelete = confirm(`Hapus tugas "${t.taskName}"?`);
+      if(!doDelete) return;
+      const remaining = tasks.filter(x => x.id !== id);
+      saveTasks(remaining);
+      showToast('Tugas dihapus');
+      renderTasks();
+    };
 
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Karena bulan dimulai dari 0
-    const year = date.getFullYear();
-    return `${day}   ${month}   ${year}`;
-}
+    /* === Helpers for status and formatting === */
+    // helper: pad angka jadi dua digit
+    function pad(n){ return String(n).padStart(2,'0'); }
 
-document.getElementById("taskName").addEventListener("input", function () {
-    this.value = this.value.replace(/\b\w/g, char => char.toUpperCase());
-});
+    function formatDeadline(deadline){
+      if(!deadline) return '<div style="color:var(--muted)">-</div>';
 
-// Menampilkan tugas saat halaman dimuat
-document.addEventListener("DOMContentLoaded", displayTasks);
+      // tanggal input type="date" disimpan sebagai "YYYY-MM-DD"
+      const parts = String(deadline).split('-');
+      if(parts.length !== 3) return '<div style="color:var(--muted)">-</div>';
+
+      const [y, m, d] = parts.map(p => Number(p));
+      // buat Date dengan waktu lokal agar getDay() konsisten dengan zona lokal
+      const dateObj = new Date(y, m - 1, d);
+      if(isNaN(dateObj)) return '<div style="color:var(--muted)">-</div>';
+
+      const days = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+      const dayName = days[dateObj.getDay()];
+      const dayNumber = pad(d);
+      const monthNumber = pad(m);
+
+      // kembalikan HTML — renderTasks memakai innerHTML, jadi ini akan menjadi markup
+      return `
+        <div class="dl-wrapper" aria-label="Tenggat: ${dayName} ${dayNumber}/${monthNumber}/${y}">
+          <div class="dl-day">${dayName}</div>
+          <div class="dl-date">${dayNumber} / ${monthNumber} / ${y}</div>
+        </div>`;
+    }
+
+    function calcRemaining(deadline){
+      const dl = new Date(deadline);
+      const now = new Date();
+      const diff = dl - now;
+      if(diff <= 0) return { label: 'Lewat Waktu', class:'dead', raw: diff };
+      const days = Math.floor(diff / (1000*60*60*24));
+      const hours = Math.floor((diff / (1000*60*60)) % 24);
+      const minutes = Math.floor((diff / (1000*60)) % 60);
+      return { label: `${days} hari ${hours} jam ${minutes} m`, class: days <= 2 ? 'urgent' : (days <= 7 ? 'warn' : 'ok'), raw: diff };
+    }
+
+    /* === Render tasks with filter, search, sort === */
+    function renderTasks(){
+      const all = loadTasks();
+      let tasks = Array.isArray(all) ? [...all] : [];
+
+      // Search
+      const q = qSearch.value.trim().toLowerCase();
+      if(q) tasks = tasks.filter(t => t.taskName.toLowerCase().includes(q));
+
+      // Sort
+      const s = sortBy.value;
+      if(s === 'deadline_asc') tasks.sort((a,b)=> new Date(a.deadline) - new Date(b.deadline));
+      else if(s === 'deadline_desc') tasks.sort((a,b)=> new Date(b.deadline) - new Date(a.deadline));
+      else if(s === 'created_desc') tasks.sort((a,b)=> new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+      // Render
+      taskTableBody.innerHTML = '';
+      if(tasks.length === 0){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="5" style="padding:28px;color:var(--muted)">Belum ada tugas. Klik "Tambah" untuk membuat tugas baru.</td>`;
+        taskTableBody.appendChild(tr); return;
+      }
+
+      tasks.forEach(t => {
+        const rem = calcRemaining(t.deadline);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="text-align:left">
+            <div style="font-weight:700">${escapeHtml(t.taskName)}</div>
+            <div style="font-size:12px;color:var(--muted)">Dibuat: ${new Date(t.createdAt || t.id).toLocaleDateString('id-ID')}</div>
+          </td>
+          <td>${formatDeadline(t.deadline)}</td>
+          <td>${rem.label}</td>
+          <td><span class="badge ${rem.class}">${badgeText(rem.class)}</span></td>
+          <td>
+            <button class="action-btn btn-edit" onclick="editTask(${t.id})" title="Edit">✏️ Edit</button>
+            <button class="action-btn btn-delete" onclick="deleteTask(${t.id})" title="Hapus">🗑️ Hapus</button>
+          </td>
+        `;
+        taskTableBody.appendChild(tr);
+      });
+    }
+
+    function badgeText(cls){
+      if(cls === 'ok') return 'Santai';
+      if(cls === 'warn') return 'Penting';
+      if(cls === 'urgent') return 'Segera';
+      if(cls === 'dead') return 'Lewat';
+      return '—';
+    }
+
+    // basic XSS escape for innerText equivalents
+    function escapeHtml(s){ return String(s).replace(/[&<>"'`=\/]/g, function (c) { return '&#'+c.charCodeAt(0)+';'; }); }
+
+    /* === Live update remaining time every 60s (keeps UI fresh) === */
+    function startAutoRefresh(){
+      if(refreshTimer) clearInterval(refreshTimer);
+      refreshTimer = setInterval(()=> {
+        // Only re-render the list to update remaining times and badges
+        renderTasks();
+      }, 60_000); // 60s
+    }
+
+    /* === Event wiring === */
+    qSearch.addEventListener('input', ()=> renderTasks());
+    sortBy.addEventListener('change', ()=> renderTasks());
+
+    /* initialize */
+    (function initDemoDataIfEmpty(){
+      const stored = loadTasks();
+      if(!stored || stored.length === 0){
+        // optional: add a sample task to show UI on first load (comment out if unwanted)
+        const sample = [
+          { id: uid(), taskName: 'Selesaikan laporan proyek', deadline: new Date(Date.now() + 1000*60*60*24*3).toISOString().slice(0,10), createdAt: new Date().toISOString() },
+          { id: uid(), taskName: 'Persiapan presentasi', deadline: new Date(Date.now() + 1000*60*60*24*1).toISOString().slice(0,10), createdAt: new Date().toISOString() },
+          { id: uid(), taskName: 'Perbaiki bug di modul X', deadline: new Date(Date.now() - 1000*60*60*24*2).toISOString().slice(0,10), createdAt: new Date().toISOString() }
+        ];
+        saveTasks(sample);
+      }
+    })();
+
+    // initial render + auto refresh
+    renderTasks();
+    startAutoRefresh();
+
+    // Accessibility: close modal on Escape
+    document.addEventListener('keydown', (e)=> {
+      if(e.key === 'Escape' && taskModal.classList.contains('show')) closeModalFn();
+    });
+
+    // expose render for dev
+    window.renderTasks = renderTasks;
+
+    // small improvement: when page gains focus, refresh times immediately
+    window.addEventListener('focus', renderTasks);
+
   </script>
 </body>
 </html>
