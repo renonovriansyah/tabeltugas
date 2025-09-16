@@ -225,13 +225,75 @@
     /* footer small */
     .meta { font-size:13px;color:var(--muted); margin-top:8px; text-align:right }
 
-    /* responsive */
-    @media (max-width:900px){
-      .brand p{display:none}
-      .clock{min-width:100px}
-      table{font-size:13px}
-      thead th{font-size:13px}
-    }
+    @media (max-width: 600px) {
+  header.appbar {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .brand {
+    min-width: auto;
+    gap: 8px;
+  }
+  .brand p {
+    display: none;
+  }
+  .controls {
+    margin-left: 0;
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .tools {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .searchbox {
+    min-width: 100%;
+  }
+  select, button, input[type="search"] {
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+  .clock {
+    min-width: auto;
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  table {
+    min-width: 600px;
+    font-size: 12px;
+  }
+  thead th, tbody td {
+    padding: 8px 6px;
+  }
+  tbody td:first-child {
+    text-align: left;
+    white-space: normal;
+  }
+  tbody td, thead th {
+    min-width: auto !important;
+  }
+
+  .action-btn {
+    padding: 6px 8px;
+    font-size: 12px;
+    margin: 2px;
+  }
+
+  .modal-card {
+    width: 90%;
+    padding: 12px;
+  }
+  .modal-card h3 {
+    font-size: 18px;
+  }
+  .form-row label, .form-row input {
+    font-size: 14px;
+  }
+}
+
 
   </style>
 </head>
