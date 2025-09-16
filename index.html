@@ -226,74 +226,98 @@
     .meta { font-size:13px;color:var(--muted); margin-top:8px; text-align:right }
 
     @media (max-width: 600px) {
-    header.appbar {
-      flex-wrap: nowrap; /* ubah dari wrap ke nowrap */
-      gap: 12px;
-      align-items: center;
-    }
-    .brand {
-      min-width: auto;
-      gap: 8px;
-      flex: 1; /* agar brand mengambil ruang yang cukup */
-      display: flex;
-      align-items: center;
-    }
-    .brand p {
-      display: none;
-    }
-    .clock {
-      min-width: auto;
-      padding: 6px 8px;
-      font-size: 12px;
-      margin-left: 12px; /* beri jarak dari brand */
-    }
-    .controls {
-      margin-left: auto;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    .tools {
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .searchbox {
-      min-width: 100%;
-    }
-    select, button, input[type="search"] {
-      font-size: 14px;
-      padding: 6px 10px;
-    }
-    table {
-      min-width: 600px;
-      font-size: 12px;
-    }
-    thead th, tbody td {
-      padding: 8px 6px;
-    }
-    tbody td:first-child {
-      text-align: left;
-      white-space: normal;
-    }
-    tbody td, thead th {
-      min-width: auto !important;
-    }
-    .action-btn {
-      padding: 6px 8px;
-      font-size: 12px;
-      margin: 2px;
-    }
-    .modal-card {
-      width: 90%;
-      padding: 12px;
-    }
-    .modal-card h3 {
-      font-size: 18px;
-    }
-    .form-row label, .form-row input {
-      font-size: 14px;
-    }
+  header.appbar {
+    display: flex;
+    flex-wrap: wrap; /* biarkan wrap agar bisa turun baris */
+    gap: 8px;
+    align-items: center;
   }
+
+  /* Baris pertama: brand dan clock sejajar */
+  .brand, .clock {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+  }
+  .brand {
+    gap: 8px;
+  }
+  .brand p {
+    display: none; /* sembunyikan paragraf kecil untuk ruang */
+  }
+  .clock {
+    justify-content: flex-end;
+    font-size: 12px;
+    padding: 6px 8px;
+    min-width: auto;
+  }
+
+  /* Baris kedua: controls full width */
+  .controls {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .tools {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .searchbox {
+    min-width: 100%;
+  }
+
+  select, button, input[type="search"] {
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+
+  .clock .day {
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .clock .time {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  table {
+    min-width: 600px;
+    font-size: 12px;
+  }
+  thead th, tbody td {
+    padding: 8px 6px;
+  }
+  tbody td:first-child {
+    text-align: left;
+    white-space: normal;
+  }
+  tbody td, thead th {
+    min-width: auto !important;
+  }
+
+  .action-btn {
+    padding: 6px 8px;
+    font-size: 12px;
+    margin: 2px;
+  }
+
+  .modal-card {
+    width: 90%;
+    padding: 12px;
+  }
+  .modal-card h3 {
+    font-size: 18px;
+  }
+  .form-row label, .form-row input {
+    font-size: 14px;
+  }
+}
 
   </style>
 </head>
