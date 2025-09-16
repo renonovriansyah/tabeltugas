@@ -227,63 +227,38 @@
 
     @media (max-width: 600px) {
   header.appbar {
-    display: flex;
-    flex-wrap: wrap; /* biarkan wrap agar bisa turun baris */
-    gap: 8px;
-    align-items: center;
-  }
-
-  /* Baris pertama: brand dan clock sejajar */
-  .brand, .clock {
-    flex: 1 1 auto;
-    display: flex;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
   }
   .brand {
+    min-width: auto;
     gap: 8px;
   }
   .brand p {
-    display: none; /* sembunyikan paragraf kecil untuk ruang */
+    display: none;
   }
-  .clock {
-    justify-content: flex-end;
-    font-size: 12px;
-    padding: 6px 8px;
-    min-width: auto;
-  }
-
-  /* Baris kedua: controls full width */
   .controls {
+    margin-left: 0;
     width: 100%;
-    display: flex;
-    justify-content: flex-start;
-    gap: 10px;
+    justify-content: space-between;
     flex-wrap: wrap;
-    margin-top: 8px;
+    gap: 8px;
   }
-
   .tools {
     flex-wrap: wrap;
     gap: 8px;
   }
-
   .searchbox {
     min-width: 100%;
   }
-
   select, button, input[type="search"] {
     font-size: 14px;
     padding: 6px 10px;
   }
-
-  .clock .day {
-    font-weight: 600;
+  .clock {
+    min-width: auto;
+    padding: 6px 8px;
     font-size: 12px;
-  }
-  .clock .time {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
   }
 
   table {
@@ -318,6 +293,7 @@
     font-size: 14px;
   }
 }
+
 
   </style>
 </head>
